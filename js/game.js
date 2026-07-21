@@ -211,8 +211,10 @@
   fit();
   engine.start();
 
-  // PWA
+  // PWA — force update so old cached engine.js cannot freeze on door touch
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
+    navigator.serviceWorker.register("./sw.js?v=3").then((reg) => {
+      reg.update().catch(() => {});
+    }).catch(() => {});
   }
 })();

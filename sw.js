@@ -1,4 +1,4 @@
-const CACHE = "level-lie-v1";
+const CACHE = "level-lie-v3";
 const ASSETS = [
   "./",
   "./index.html",
@@ -25,8 +25,32 @@ self.addEventListener("activate", (e) => {
   self.clients.claim();
 });
 
+// Network-first for HTML/JS/CSS so code fixes are not stuck behind an old cache.
 self.addEventListener("fetch", (e) => {
-  e.respondWith(
-    caches.match(e.request).then((r) => r || fetch(e.request))
-  );
+  const req = e.request;
+  if (req.method !== "GET") return;
+
+  const url = new URL(req.url);
+  const path = url.pathname;
+  const isCode =
+    path.endsWith(".js") ||
+    path.endsWith(".css") ||
+    path.endsWith(".html") ||
+    path.endsWith("/") ||
+    path.endsWith("/sw.js");
+
+  if (isCode) {
+    e.respondWith(
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, copy));
+          return res;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  e.respondWith(caches.match(req).then((r) => r || fetch(req)));
 });

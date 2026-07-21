@@ -65,15 +65,21 @@
 
     deepCloneLevel(src) {
       // Scripts hold `run` functions — JSON clone would strip them and freeze the game.
-      const { scripts, ...data } = src;
+      const scripts = src.scripts;
+      const data = { ...src };
+      delete data.scripts;
       const cloned = JSON.parse(JSON.stringify(data));
+      // Always reattach from the live LEVELS definition (not a stale clone).
       cloned.scripts = scripts || [];
       return cloned;
     }
 
     startLevel(index) {
       this.levelIndex = index;
-      this.level = this.deepCloneLevel(window.LEVELS[index]);
+      const src = window.LEVELS[index];
+      this.level = this.deepCloneLevel(src);
+      // Belt-and-suspenders: never let scripts lose their run() handlers.
+      this.level.scripts = src.scripts || [];
       this.deaths = 0;
       this.levelTime = 0;
       this.flags = {};
