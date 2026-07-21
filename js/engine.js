@@ -64,7 +64,11 @@
     }
 
     deepCloneLevel(src) {
-      return JSON.parse(JSON.stringify(src));
+      // Scripts hold `run` functions — JSON clone would strip them and freeze the game.
+      const { scripts, ...data } = src;
+      const cloned = JSON.parse(JSON.stringify(data));
+      cloned.scripts = scripts || [];
+      return cloned;
     }
 
     startLevel(index) {
@@ -173,7 +177,7 @@
     runScripts(type, extra) {
       const scripts = this.level?.scripts || [];
       scripts.forEach((s, i) => {
-        if (s.type !== type) return;
+        if (s.type !== type || typeof s.run !== "function") return;
         const key = `${type}_${i}`;
         if (s.once && this._scriptState[key]) return;
         if (type === "onDeathCount" && this.deaths < (s.count || 1)) return;
@@ -186,6 +190,7 @@
     updateScripts(dt) {
       const scripts = this.level?.scripts || [];
       scripts.forEach((s, i) => {
+        if (typeof s.run !== "function") return;
         if (s.type === "onUpdate") s.run(this, dt);
         if (s.type === "onTimer") {
           const key = `onTimer_${i}`;
@@ -408,8 +413,7 @@
       // touch door scripts always
       const scripts = this.level.scripts || [];
       scripts.forEach((s, i) => {
-        if (s.type !== "onTouchDoor") return;
-        const key = `onTouchDoor_${i}_${this.deaths}`;
+        if (s.type !== "onTouchDoor" || typeof s.run !== "function") return;
         if (s.once && this._scriptState[`onTouchDoor_${i}`]) return;
         if (s.once) this._scriptState[`onTouchDoor_${i}`] = true;
         s.run(this);

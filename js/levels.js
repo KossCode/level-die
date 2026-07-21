@@ -41,6 +41,8 @@ window.LEVELS = [
         count: 1,
         once: true,
         run(game) {
+          // Keep spawn on the right so respawn doesn't instantly overlap the real door.
+          game.level.spawn = { x: 300, y: 420 };
           game.level.door = { x: 48, y: 416, w: 36, h: 64, real: true };
           game.say("Теперь слева. Или нет?");
         },
