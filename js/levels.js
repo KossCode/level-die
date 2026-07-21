@@ -41,8 +41,9 @@ window.LEVELS = [
         count: 1,
         once: true,
         run(game) {
-          // Keep spawn on the right so respawn doesn't instantly overlap the real door.
-          game.level.spawn = { x: 300, y: 420 };
+          // Mid-floor: clear of the real door on the left AND the spikes under the fake door.
+          // (Old spawn x:300 overlapped the spike at x:292 and soft-locked the run.)
+          game.level.spawn = { x: 200, y: 420 };
           game.level.door = { x: 48, y: 416, w: 36, h: 64, real: true };
           game.say("Теперь слева. Или нет?");
         },
