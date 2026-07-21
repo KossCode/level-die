@@ -1,0 +1,22 @@
+{
+  "name": "LEVEL LIE",
+  "short_name": "LEVEL LIE",
+  "description": "Коварный платформер. Дверь врёт. Пол врёт.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#140f0c",
+  "theme_color": "#140f0c",
+  "icons": [
+    {
+      "src": "icons/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="LEVEL LIE" />
+  <meta name="theme-color" content="#140f0c" />
+  <meta name="description" content="Коварный платформер. Дверь врёт. Пол врёт. Кнопка прыжка тоже." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <title>LEVEL LIE</title>
+</head>
+<body>
+  <div id="app">
+    <header id="hud" class="hidden">
+      <div class="hud-left">
+        <span id="level-label">LEVEL 1</span>
+        <span id="death-count">смертей 0</span>
+      </div>
+      <button id="btn-restart" type="button" aria-label="Restart">↻</button>
+    </header>
+
+    <canvas id="game" width="390" height="700"></canvas>
+
+    <div id="title-screen" class="screen">
+      <div class="title-glow"></div>
+      <p class="eyebrow">не доверяй ничему</p>
+      <h1>LEVEL<br />LIE</h1>
+      <p class="tagline">Дверь смотрит на тебя.<br />И улыбается.</p>
+      <button id="btn-start" class="cta" type="button">ИГРАТЬ</button>
+      <p class="hint-mini">Добавь на экран «Домой» — как настоящее приложение</p>
+    </div>
+
+    <div id="level-banner" class="banner hidden" aria-live="polite"></div>
+
+    <div id="win-screen" class="screen hidden">
+      <h2>ТЫ ПОБЕДИЛ?</h2>
+      <p id="win-text">Или просто так кажется.</p>
+      <button id="btn-next" class="cta" type="button">ДАЛЬШЕ</button>
+    </div>
+
+    <div id="controls" class="hidden">
+      <div class="pad">
+        <button id="btn-left" type="button" aria-label="Left">◀</button>
+        <button id="btn-right" type="button" aria-label="Right">▶</button>
+      </div>
+      <button id="btn-jump" type="button" aria-label="Jump">прыг</button>
+    </div>
+  </div>
+
+  <script src="js/levels.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
