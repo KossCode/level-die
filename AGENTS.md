@@ -25,6 +25,7 @@ step, no backend, no database, no package manager.
   testing — `ArrowLeft`/`A` = left, `ArrowRight`/`D` = right, `ArrowUp`/`W`/`Space` = jump.
   Click the canvas first to give it keyboard focus.
 - The UI text is in Russian (e.g. `ИГРАТЬ` = Play, `смертей` = deaths).
-- Known pre-existing game-logic bug (NOT an environment problem): on Level 1, after the
-  first (fake-door) death the player respawns on top of the freshly spawned spike, which
-  causes a rapid repeated death loop. Do not "fix" this as part of environment work.
+- After a respawn, the engine runs `ensureSafeSpawn()` and a short `spawnGrace`
+  (~0.7s) so the player cannot soft-lock by appearing inside lethal hazards.
+  Level scripts that move the spawn (e.g. Level 1 after the fake door) must keep
+  the new spawn clear of spikes — the engine will also nudge if they don't.

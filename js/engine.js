@@ -36,6 +36,7 @@
       this.inputScale = { x: 1, jump: true };
       this.reverseTimer = 0;
       this.jumpDisableTimer = 0;
+      this.spawnGrace = 0;
       this.flags = {};
       this._scriptState = {};
 
@@ -87,6 +88,7 @@
       this.particles = [];
       this.reverseTimer = 0;
       this.jumpDisableTimer = 0;
+      this.spawnGrace = 0;
       this.inputScale = { x: 1, jump: true };
       this.message = "";
       this.messageTimer = 0;
@@ -119,6 +121,53 @@
           }
           if (h._oy == null) h._oy = h.y;
         });
+      }
+      // Never leave the player standing inside a lethal hazard (soft-lock / death loop).
+      this.ensureSafeSpawn();
+      this.spawnGrace = 0.7;
+    }
+
+    isHazardLethal(h) {
+      if (!h) return false;
+      if (h.hidden) return false;
+      if (h.armed === false) return false;
+      return true;
+    }
+
+    overlapsLethalHazard(body) {
+      for (const h of this.level.hazards || []) {
+        if (!this.isHazardLethal(h)) continue;
+        if (this.aabb(body, h)) return true;
+      }
+      return false;
+    }
+
+    /**
+     * If the current spawn overlaps a lethal hazard, nudge the player to the
+     * nearest clear x on the same y. Prevents "spawn on spikes → endless deaths".
+     */
+    ensureSafeSpawn() {
+      const p = this.player;
+      if (!p || !this.overlapsLethalHazard(p)) return;
+
+      const preferred = this.level.spawn?.x ?? p.x;
+      const y = p.y;
+      let best = null;
+      let bestDist = Infinity;
+
+      for (let x = 18; x <= this.W - p.w - 18; x += 8) {
+        const probe = { x, y, w: p.w, h: p.h };
+        if (this.overlapsLethalHazard(probe)) continue;
+        const dist = Math.abs(x - preferred);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = x;
+        }
+      }
+
+      if (best != null) {
+        p.x = best;
+        this.level.spawn = { x: best, y };
       }
     }
 
@@ -255,6 +304,7 @@
         if (this.reverseTimer <= 0) this.inputScale.x = 1;
       }
       if (this.jumpDisableTimer > 0) this.jumpDisableTimer -= dt;
+      if (this.spawnGrace > 0) this.spawnGrace -= dt;
 
       // Falling ceiling spikes
       (this.level.hazards || []).forEach((h) => {
@@ -400,9 +450,10 @@
     checkHazards() {
       const p = this.player;
       if (!p.alive) return;
+      // Brief post-respawn grace so a bad spawn cannot soft-lock the run.
+      if (this.spawnGrace > 0) return;
       for (const h of this.level.hazards || []) {
-        if (h.hidden) continue;
-        if (h.armed === false) continue;
+        if (!this.isHazardLethal(h)) continue;
         if (this.aabb(p, h)) {
           this.killPlayer("шип");
           return;
